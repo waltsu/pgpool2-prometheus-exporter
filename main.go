@@ -8,6 +8,7 @@ import (
 	// TODO: Move prometheus related things to exporter/prometheus.go
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/waltsu/pgpool2-prometheus-exporter/exporter"
 )
 
 var (
@@ -33,8 +34,8 @@ func startMetricGathering() {
 
 	registerPrometheusMetrics()
 
-	bashExecutor := new(BashExecutor)
-	pgpool := NewPgPool(bashExecutor)
+	bashExecutor := new(exporter.BashExecutor)
+	pgpool := exporter.NewPgPool(bashExecutor)
 
 	for {
 		gatherMetrics(pgpool)
@@ -46,7 +47,7 @@ func registerPrometheusMetrics() {
 	prometheus.MustRegister(nodeCountGauge)
 }
 
-func gatherMetrics(pgpool *PgPool) {
+func gatherMetrics(pgpool *exporter.PgPool) {
 	nodeCount, err := pgpool.GetNodeCount()
 
 	if err != nil {
