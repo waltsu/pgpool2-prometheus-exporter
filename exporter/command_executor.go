@@ -1,15 +1,15 @@
 package exporter
 
 import (
-  "bytes"
+	"bytes"
 )
 
 type CommandExecutor interface {
-  Execute(command string, args ...string) (*bytes.Buffer, error)
+	Execute(command string, args ...string) (*bytes.Buffer, error)
 }
 
-type BashExecutor struct {}
+type BashExecutor struct{}
 
 func (bash *BashExecutor) Execute(command string, args ...string) (*bytes.Buffer, error) {
-  return bytes.NewBufferString("test"), nil
+	return bytes.NewBufferString("test"), nil
 }
