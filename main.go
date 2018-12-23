@@ -5,6 +5,7 @@ import (
   "net/http"
   "time"
 
+  // TODO: Move prometheus related things to exporter/prometheus.go
   "github.com/prometheus/client_golang/prometheus"
   "github.com/prometheus/client_golang/prometheus/promhttp"
 )
