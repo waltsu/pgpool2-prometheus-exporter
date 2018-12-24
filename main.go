@@ -34,8 +34,9 @@ func startMetricGathering() {
 
 	registerPrometheusMetrics()
 
-	bashExecutor := new(exporter.BashExecutor)
-	pgpool := exporter.NewPgPool(bashExecutor)
+	commandExecutor := new(exporter.BashExecutor)
+	//commandExecutor := new(exporter.TestExecutor)
+	pgpool := exporter.NewPgPool(commandExecutor)
 
 	for {
 		gatherMetrics(pgpool)
@@ -51,7 +52,7 @@ func gatherMetrics(pgpool *exporter.PgPool) {
 	nodeCount, err := pgpool.GetNodeCount()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 	nodeCountGauge.Set(float64(nodeCount))
