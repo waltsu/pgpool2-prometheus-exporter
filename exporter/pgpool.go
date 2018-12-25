@@ -11,7 +11,7 @@ var (
 	PcpHost = GetEnv("PCP_HOST", "localhost")
 	PcpPort = GetEnv("PCP_PORT", "9898")
 
-	PcpDefaultArguments = []string{ "-w", "-U " + PcpUsername, "-h " + PcpHost, "-p " + PcpPort }
+	PcpDefaultArguments = []string{ "--username=" + PcpUsername, "--host=" + PcpHost, "--port=" + PcpPort, "-w" }
 )
 
 type PgPool struct {
