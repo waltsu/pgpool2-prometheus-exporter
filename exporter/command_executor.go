@@ -1,7 +1,6 @@
 package exporter
 
 import (
-	"log"
 	"bytes"
 	"os/exec"
 )
@@ -20,8 +19,6 @@ func (bash *BashExecutor) Execute(command string, args ...string) (*bytes.Buffer
 	execCommand.Stderr = stdout
 
 	error := execCommand.Run()
-	log.Println("Executed command")
-	log.Println(stdout.String())
 	if error != nil {
 		return nil, error
 	}
