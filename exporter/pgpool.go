@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -32,7 +33,7 @@ func (pgpool *PgPool) GetNodeCount() (int64, error) {
 		return -1, err
 	}
 
-	node_count, err := strconv.ParseInt(response.String(), 10, 32)
+	node_count, err := strconv.ParseInt(strings.TrimSuffix(response.String(), "\n"), 10, 32)
 	if err != nil {
 		return -1, err
 	}
