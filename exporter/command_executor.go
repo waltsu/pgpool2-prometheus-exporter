@@ -24,9 +24,3 @@ func (bash *BashExecutor) Execute(command string, args ...string) (*bytes.Buffer
 	}
 	return stdout, nil
 }
-
-type TestExecutor struct{}
-
-func (bash *TestExecutor) Execute(command string, args ...string) (*bytes.Buffer, error) {
-	return bytes.NewBufferString("test"), nil
-}

@@ -35,7 +35,6 @@ func startMetricGathering() {
 	registerPrometheusMetrics()
 
 	commandExecutor := new(exporter.BashExecutor)
-	//commandExecutor := new(exporter.TestExecutor)
 	pgpool := exporter.NewPgPool(commandExecutor)
 
 	for {
