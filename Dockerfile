@@ -10,6 +10,8 @@ RUN dep ensure
 RUN go build .
 
 FROM debian:jessie-slim
+
+# Install pgpool to get pcp_* binaries
 RUN \
   apt-get update && \
   apt-get --assume-yes --no-install-recommends install \
@@ -22,9 +24,12 @@ RUN \
     pgpool2=4.0.2-1.pgdg80+1 && \
   rm -rf /var/lib/apt/lists/*
 
+
 RUN mkdir /app
 COPY --from=builder /go/src/github.com/waltsu/pgpool2-prometheus-exporter/pgpool2-prometheus-exporter /app/
+COPY --from=builder /go/src/github.com/waltsu/pgpool2-prometheus-exporter/entrypoint.sh /app/
 WORKDIR /app
 
 EXPOSE 8080
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["./pgpool2-prometheus-exporter"]
