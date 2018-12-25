@@ -4,16 +4,17 @@ import (
 	"bytes"
 	"errors"
 
-  "testing"
-  "github.com/stretchr/testify/assert"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-type TestExecutor struct{
+type TestExecutor struct {
 	returnStdout *bytes.Buffer
-	errorValue error
+	errorValue   error
 }
 
-func NewTestExecutor(stdout string, errorValue error) TestExecutor{
+func NewTestExecutor(stdout string, errorValue error) TestExecutor {
 	return TestExecutor{bytes.NewBufferString(stdout), errorValue}
 }
 
@@ -36,7 +37,7 @@ func TestGetNodeCountFailsWhenInvocationFails(t *testing.T) {
 
 	nodeCount, err := pgpool.GetNodeCount()
 	assert.Equal(t, nodeCount, -1)
-	assert.NotNil(t, err);
+	assert.NotNil(t, err)
 }
 
 func TestGetNodeCountFailsWithMalformedStdout(t *testing.T) {
@@ -46,5 +47,5 @@ func TestGetNodeCountFailsWithMalformedStdout(t *testing.T) {
 
 	nodeCount, err := pgpool.GetNodeCount()
 	assert.Equal(t, nodeCount, -1)
-	assert.NotNil(t, err);
+	assert.NotNil(t, err)
 }
