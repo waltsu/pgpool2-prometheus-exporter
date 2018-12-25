@@ -2,6 +2,7 @@ package exporter
 
 import (
 	"bytes"
+	"errors"
 
   "testing"
   "github.com/stretchr/testify/assert"
@@ -26,4 +27,24 @@ func TestGetNodeCountReturnsNodeCount(t *testing.T) {
 
 	nodeCount, _ := pgpool.GetNodeCount()
 	assert.Equal(t, nodeCount, int64(5))
+}
+
+func TestGetNodeCountFailsWhenInvocationFails(t *testing.T) {
+	testExecutor := NewTestExecutor("", errors.New("boom"))
+
+	pgpool := NewPgPool(testExecutor)
+
+	nodeCount, err := pgpool.GetNodeCount()
+	assert.Equal(t, nodeCount, int64(-1))
+	assert.NotNil(t, err);
+}
+
+func TestGetNodeCountFailsWithMalformedStdout(t *testing.T) {
+	testExecutor := NewTestExecutor("foobar", nil)
+
+	pgpool := NewPgPool(testExecutor)
+
+	nodeCount, err := pgpool.GetNodeCount()
+	assert.Equal(t, nodeCount, int64(-1))
+	assert.NotNil(t, err);
 }
