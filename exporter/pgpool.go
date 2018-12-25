@@ -2,6 +2,7 @@ package exporter
 
 import (
 	"log"
+	"fmt"
 )
 
 var (
@@ -19,6 +20,7 @@ type PgPool struct {
 }
 
 func NewPgPool(executor CommandExecutor) *PgPool {
+	log.Println(fmt.Sprintf("Create new pgpool client with location %s and default arguments %s", PcpLocation, PcpDefaultArguments))
 	pgpool := &PgPool{executor}
 	return pgpool
 }
