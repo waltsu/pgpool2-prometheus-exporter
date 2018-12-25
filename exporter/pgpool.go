@@ -27,13 +27,13 @@ func NewPgPool(executor CommandExecutor) *PgPool {
 	return pgpool
 }
 
-func (pgpool *PgPool) GetNodeCount() (int64, error) {
+func (pgpool *PgPool) GetNodeCount() (int, error) {
 	response, err := pgpool.commandExecutor.Execute(PcpLocation+"pcp_node_count", PcpDefaultArguments...)
 	if err != nil {
 		return -1, err
 	}
 
-	node_count, err := strconv.ParseInt(strings.TrimSuffix(response.String(), "\n"), 10, 32)
+	node_count, err := strconv.Atoi(strings.TrimSuffix(response.String(), "\n"))
 	if err != nil {
 		return -1, err
 	}

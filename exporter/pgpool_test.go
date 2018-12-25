@@ -26,7 +26,7 @@ func TestGetNodeCountReturnsNodeCount(t *testing.T) {
 	pgpool := NewPgPool(testExecutor)
 
 	nodeCount, _ := pgpool.GetNodeCount()
-	assert.Equal(t, nodeCount, int64(5))
+	assert.Equal(t, nodeCount, 5)
 }
 
 func TestGetNodeCountFailsWhenInvocationFails(t *testing.T) {
@@ -35,7 +35,7 @@ func TestGetNodeCountFailsWhenInvocationFails(t *testing.T) {
 	pgpool := NewPgPool(testExecutor)
 
 	nodeCount, err := pgpool.GetNodeCount()
-	assert.Equal(t, nodeCount, int64(-1))
+	assert.Equal(t, nodeCount, -1)
 	assert.NotNil(t, err);
 }
 
@@ -45,6 +45,6 @@ func TestGetNodeCountFailsWithMalformedStdout(t *testing.T) {
 	pgpool := NewPgPool(testExecutor)
 
 	nodeCount, err := pgpool.GetNodeCount()
-	assert.Equal(t, nodeCount, int64(-1))
+	assert.Equal(t, nodeCount, -1)
 	assert.NotNil(t, err);
 }
