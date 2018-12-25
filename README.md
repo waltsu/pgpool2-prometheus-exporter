@@ -22,7 +22,7 @@ The Docker image contains pgpool's pcp-binaries that it will invoke and parse th
 * PCP_PORT - Port where pcp process is running
 
 ### Usage
-Since the exporter requires running pgpool and pcp process, running it standalone doesn't make much sense. Instead exporter is designed to run as Kubernetes' sidecar pod. Instructions how to do that will be added later.
+Since the exporter requires running pgpool and pcp process, running it standalone doesn't make much sense. Instead exporter is designed to run as Kubernetes' sidecar container. Instructions how to do that will be added later.
 
 
 ## Exported metrics
