@@ -24,9 +24,6 @@ func startMetricGathering() {
 
 	commandExecutor := new(exporter.BashExecutor)
 	pgpool := exporter.NewPgPool(commandExecutor)
-	consumer := exporter.NewConsumer()
-	metricsChannel := make(chan *exporter.Metrics)
 
-	go pgpool.StartMetricsProducer(metricsChannel)
-	go consumer.StartMetricsConsumer(metricsChannel)
+	exporter.NewMetricsExporter(pgpool)
 }

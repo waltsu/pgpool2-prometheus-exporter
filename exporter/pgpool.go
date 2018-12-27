@@ -29,6 +29,7 @@ func NewPgPool(executor CommandExecutor) *PgPool {
 }
 
 func (pgpool PgPool) StartMetricsProducer(metricsChannel chan<- *Metrics) {
+	log.Println("Starting metrics producer")
 	for {
 		metrics := &Metrics{}
 
@@ -37,7 +38,6 @@ func (pgpool PgPool) StartMetricsProducer(metricsChannel chan<- *Metrics) {
 		}
 
 		metricsChannel <- metrics
-		log.Println("Metrics gathered")
 
 		time.Sleep(1 * time.Second) // TODO: Set sleep value from env variable
 	}
