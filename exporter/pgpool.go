@@ -1,8 +1,10 @@
 package exporter
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -22,11 +24,11 @@ type PgPool struct {
 }
 
 type NodeInfo struct {
-	hostname string
-	port int
-	status int
-	weight float64
-	role string
+	hostname         string
+	port             int
+	status           int
+	weight           float64
+	role             string
 	replicationDelay int
 }
 
@@ -42,10 +44,62 @@ func (pgpool PgPool) GetNodeCount() (int, error) {
 		return -1, err
 	}
 
-	node_count, err := strconv.Atoi(strings.TrimSuffix(response.String(), "\n"))
+	node_count, err := strconv.Atoi(trimNewLine(response))
 	if err != nil {
 		return -1, err
 	}
 
 	return node_count, nil
+}
+
+func (pgpool PgPool) GetNodeInfos() []NodeInfo {
+	nodeInfos := []NodeInfo{}
+
+	nodeCount, err := pgpool.GetNodeCount()
+	if err != nil {
+		log.Println(err)
+		return nodeInfos
+	}
+
+	nodeInfoRegexp := regexp.MustCompile(`^(.*?)\s(\d*?)\s(.\d*?)\s(.*?)\s(.*?)\s(.*?)\s(\d*?)\s.*$`)
+	for i := 0; i < nodeCount; i++ {
+		argumentsWithNodeIndex := append(PcpDefaultArguments, string(i))
+		response, err := pgpool.commandExecutor.Execute(PcpLocation+"pcp_node_info", argumentsWithNodeIndex...)
+		if err != nil {
+			log.Println(err)
+			return nodeInfos
+		}
+
+		trimmedResponse := trimNewLine(response)
+		rawNodeInfo := nodeInfoRegexp.FindStringSubmatch(trimmedResponse)
+		nodeInfos = append(nodeInfos, buildNodeInfo(rawNodeInfo))
+	}
+	return nodeInfos
+}
+
+// Strips possible new line from the end of line and returns it as a string
+func trimNewLine(line *bytes.Buffer) string {
+	return strings.TrimSuffix(line.String(), "\n")
+}
+
+func buildNodeInfo(rawNodeInfo []string) NodeInfo {
+	nodeInfo := NodeInfo{}
+
+	if len(rawNodeInfo) != 8 {
+		log.Printf("Wrong amount of string elements: '%s'", rawNodeInfo)
+		return nodeInfo
+	}
+
+	nodeInfo.hostname = rawNodeInfo[1]
+	nodeInfo.port, _ = strconv.Atoi(rawNodeInfo[2])
+	nodeInfo.status, _ = strconv.Atoi(rawNodeInfo[3])
+	nodeInfo.weight, _ = strconv.ParseFloat(rawNodeInfo[4], 64)
+	nodeInfo.role = rawNodeInfo[6]
+	if replicationDelay, err := strconv.Atoi(rawNodeInfo[7]); err != nil {
+		nodeInfo.replicationDelay = -1
+	} else {
+		nodeInfo.replicationDelay = replicationDelay
+	}
+
+	return nodeInfo
 }
