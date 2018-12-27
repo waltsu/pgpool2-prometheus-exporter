@@ -27,3 +27,5 @@ Since the exporter requires running pgpool and pcp process, running it standalon
 
 ## Exported metrics
 * node_count
+* node_status
+* node_replication_delay
