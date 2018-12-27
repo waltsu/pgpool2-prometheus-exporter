@@ -11,12 +11,6 @@ const (
 )
 
 var (
-	/*
-	nodeCountGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "node_count",
-		Help: "How many nodes are in the pool at the moment",
-	})
-	*/
 	NodeCount = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "", "node_count"),
 		"How many nodes are in the pool at the moment",

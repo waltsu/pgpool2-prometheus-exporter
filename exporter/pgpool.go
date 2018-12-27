@@ -5,7 +5,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var (
@@ -22,25 +21,19 @@ type PgPool struct {
 	commandExecutor CommandExecutor
 }
 
+type NodeInfo struct {
+	hostname string
+	port int
+	status int
+	weight float64
+	role string
+	replicationDelay int
+}
+
 func NewPgPool(executor CommandExecutor) *PgPool {
 	log.Println(fmt.Sprintf("Create new pgpool client with location %s and default arguments %s", PcpLocation, PcpDefaultArguments))
 	pgpool := &PgPool{executor}
 	return pgpool
-}
-
-func (pgpool PgPool) StartMetricsProducer(metricsChannel chan<- *Metrics) {
-	log.Println("Starting metrics producer")
-	for {
-		metrics := &Metrics{}
-
-		if nodeCount, err := pgpool.GetNodeCount(); err == nil {
-			metrics.nodeCount = nodeCount
-		}
-
-		metricsChannel <- metrics
-
-		time.Sleep(1 * time.Second) // TODO: Set sleep value from env variable
-	}
 }
 
 func (pgpool PgPool) GetNodeCount() (int, error) {
