@@ -10,20 +10,30 @@ import (
 )
 
 type TestExecutor struct {
-	returnStdout *bytes.Buffer
+	returnStdouts []*bytes.Buffer
 	errorValue   error
 }
 
-func NewTestExecutor(stdout string, errorValue error) TestExecutor {
-	return TestExecutor{bytes.NewBufferString(stdout), errorValue}
+func NewTestExecutor(stdouts []string, errorValue error) *TestExecutor {
+	buffers := []*bytes.Buffer{}
+	for _, stdout := range stdouts {
+		buffers = append(buffers, bytes.NewBufferString(stdout))
+	}
+	return &TestExecutor{buffers, errorValue}
 }
 
-func (executor TestExecutor) Execute(command string, args ...string) (*bytes.Buffer, error) {
-	return executor.returnStdout, executor.errorValue
+func (executor *TestExecutor) Execute(command string, args ...string) (*bytes.Buffer, error) {
+	var returnStdout *bytes.Buffer
+	if len(executor.returnStdouts) < 2 {
+		returnStdout, executor.returnStdouts = executor.returnStdouts[0], executor.returnStdouts[1:]
+	} else {
+		returnStdout = executor.returnStdouts[0]
+	}
+	return returnStdout, executor.errorValue
 }
 
 func TestGetNodeCountReturnsNodeCount(t *testing.T) {
-	testExecutor := NewTestExecutor("5\n", nil)
+	testExecutor := NewTestExecutor([]string{"5\n"}, nil)
 	pgpool := NewPgPool(testExecutor)
 
 	nodeCount, _ := pgpool.GetNodeCount()
@@ -31,7 +41,7 @@ func TestGetNodeCountReturnsNodeCount(t *testing.T) {
 }
 
 func TestGetNodeCountFailsWhenInvocationFails(t *testing.T) {
-	testExecutor := NewTestExecutor("", errors.New("boom"))
+	testExecutor := NewTestExecutor([]string{""}, errors.New("boom"))
 
 	pgpool := NewPgPool(testExecutor)
 
@@ -41,7 +51,7 @@ func TestGetNodeCountFailsWhenInvocationFails(t *testing.T) {
 }
 
 func TestGetNodeCountFailsWithMalformedStdout(t *testing.T) {
-	testExecutor := NewTestExecutor("foobar", nil)
+	testExecutor := NewTestExecutor([]string{"foobar"}, nil)
 
 	pgpool := NewPgPool(testExecutor)
 
