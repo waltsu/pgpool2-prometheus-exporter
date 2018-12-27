@@ -24,12 +24,9 @@ var (
 	)
 )
 
-func NewMetricsExporter(pgpoolClient *PgPool) MetricsExporter {
+func InitMetricsExporter(pgpoolClient *PgPool) {
 	exporter := MetricsExporter{pgpoolClient}
-
 	prometheus.MustRegister(exporter)
-
-	return exporter
 }
 
 type MetricsExporter struct {

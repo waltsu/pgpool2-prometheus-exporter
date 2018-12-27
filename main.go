@@ -25,5 +25,5 @@ func startMetricGathering() {
 	commandExecutor := new(exporter.BashExecutor)
 	pgpool := exporter.NewPgPool(commandExecutor)
 
-	exporter.NewMetricsExporter(pgpool)
+	exporter.InitMetricsExporter(pgpool)
 }
