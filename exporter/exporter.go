@@ -22,6 +22,12 @@ var (
 		"How many nodes are in the pool at the moment",
 		[]string{"hostname"}, nil,
 	)
+
+	NodeReplicaitonDelay = prometheus.NewDesc(
+		prometheus.BuildFQName(namespace, "", "node_replication_delay"),
+		"How much the node's replication is lagging behind the primary",
+		[]string{"hostname"}, nil,
+	)
 )
 
 func InitMetricsExporter(pgpoolClient *PgPool) {
@@ -50,6 +56,9 @@ func (exporter MetricsExporter) Collect(channel chan<- prometheus.Metric) {
 		channel <- prometheus.MustNewConstMetric(
 			NodeStatus, prometheus.GaugeValue, float64(nodeInfo.status), nodeInfo.hostname,
 		)
+		channel <- prometheus.MustNewConstMetric(
+			NodeReplicaitonDelay, prometheus.GaugeValue, float64(nodeInfo.replicationDelay), nodeInfo.hostname,
+		)
 	}
 
 	if len(errors) > 0 {
@@ -60,4 +69,5 @@ func (exporter MetricsExporter) Collect(channel chan<- prometheus.Metric) {
 func (exporter MetricsExporter) Describe(channel chan<- *prometheus.Desc) {
 	channel <- NodeCount
 	channel <- NodeStatus
+	channel <- NodeReplicaitonDelay
 }
