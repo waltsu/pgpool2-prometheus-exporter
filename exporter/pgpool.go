@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -27,7 +28,22 @@ func NewPgPool(executor CommandExecutor) *PgPool {
 	return pgpool
 }
 
-func (pgpool *PgPool) GetNodeCount() (int, error) {
+func (pgpool PgPool) GatherMetrics(metricsChannel chan<- Metrics) {
+	for {
+		metrics := Metrics{}
+
+		if nodeCount, err := pgpool.GetNodeCount(); err == nil {
+			metrics.nodeCount = nodeCount
+		}
+
+		metricsChannel <- metrics
+		log.Println("Metrics gathered")
+
+		time.Sleep(1 * time.Second) // TODO: Set sleep value from env variable
+	}
+}
+
+func (pgpool PgPool) GetNodeCount() (int, error) {
 	response, err := pgpool.commandExecutor.Execute(PcpLocation+"pcp_node_count", PcpDefaultArguments...)
 	if err != nil {
 		return -1, err

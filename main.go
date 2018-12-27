@@ -3,19 +3,9 @@ package main
 import (
 	"log"
 	"net/http"
-	"time"
 
-	// TODO: Move prometheus related things to exporter/prometheus.go
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/waltsu/pgpool2-prometheus-exporter/exporter"
-)
-
-var (
-	nodeCountGauge = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "node_count",
-		Help: "How many nodes are in the pool at the moment",
-	})
 )
 
 func main() {
@@ -32,27 +22,10 @@ func startPrometheusServer() {
 func startMetricGathering() {
 	log.Println("Start gathering metrics")
 
-	registerPrometheusMetrics()
-
 	commandExecutor := new(exporter.BashExecutor)
 	pgpool := exporter.NewPgPool(commandExecutor)
+	metricsChannel := make(chan exporter.Metrics)
 
-	for {
-		gatherMetrics(pgpool)
-		time.Sleep(1 * time.Second)
-	}
-}
-
-func registerPrometheusMetrics() {
-	prometheus.MustRegister(nodeCountGauge)
-}
-
-func gatherMetrics(pgpool *exporter.PgPool) {
-	nodeCount, err := pgpool.GetNodeCount()
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	nodeCountGauge.Set(float64(nodeCount))
+	go pgpool.GatherMetrics(metricsChannel)
+	go exporter.ExportMetrics(metricsChannel)
 }
