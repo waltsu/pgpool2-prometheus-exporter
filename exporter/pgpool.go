@@ -28,9 +28,9 @@ func NewPgPool(executor CommandExecutor) *PgPool {
 	return pgpool
 }
 
-func (pgpool PgPool) GatherMetrics(metricsChannel chan<- Metrics) {
+func (pgpool PgPool) StartMetricsProducer(metricsChannel chan<- *Metrics) {
 	for {
-		metrics := Metrics{}
+		metrics := &Metrics{}
 
 		if nodeCount, err := pgpool.GetNodeCount(); err == nil {
 			metrics.nodeCount = nodeCount
