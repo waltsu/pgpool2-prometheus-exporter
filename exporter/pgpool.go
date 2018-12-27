@@ -38,6 +38,7 @@ func NewPgPool(executor CommandExecutor) *PgPool {
 	return pgpool
 }
 
+// TODO: Check if we could return -1 and just print the error. No need to make the interface more complex
 func (pgpool PgPool) GetNodeCount() (int, error) {
 	response, err := pgpool.commandExecutor.Execute(PcpLocation+"pcp_node_count", PcpDefaultArguments...)
 	if err != nil {
@@ -63,7 +64,7 @@ func (pgpool PgPool) GetNodeInfos() []NodeInfo {
 
 	nodeInfoRegexp := regexp.MustCompile(`^(.*?)\s(\d*?)\s(.\d*?)\s(.*?)\s(.*?)\s(.*?)\s(\d*?)\s.*$`)
 	for i := 0; i < nodeCount; i++ {
-		argumentsWithNodeIndex := append(PcpDefaultArguments, string(i))
+		argumentsWithNodeIndex := append(PcpDefaultArguments, strconv.Itoa(i))
 		response, err := pgpool.commandExecutor.Execute(PcpLocation+"pcp_node_info", argumentsWithNodeIndex...)
 		if err != nil {
 			log.Println(err)

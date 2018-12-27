@@ -16,6 +16,12 @@ var (
 		"How many nodes are in the pool at the moment",
 		nil, nil,
 	)
+
+	NodeStatus = prometheus.NewDesc(
+		prometheus.BuildFQName(namespace, "", "node_status"),
+		"How many nodes are in the pool at the moment",
+		[]string{"hostname"}, nil,
+	)
 )
 
 func InitMetricsExporter(pgpoolClient *PgPool) {
@@ -39,6 +45,13 @@ func (exporter MetricsExporter) Collect(channel chan<- prometheus.Metric) {
 		errors = append(errors, err)
 	}
 
+	nodeInfos := client.GetNodeInfos()
+	for _, nodeInfo := range nodeInfos {
+		channel <- prometheus.MustNewConstMetric(
+			NodeStatus, prometheus.GaugeValue, float64(nodeInfo.status), nodeInfo.hostname,
+		)
+	}
+
 	if len(errors) > 0 {
 		log.Printf("Got errors when collecting metrics: %s\n", errors)
 	}
@@ -46,4 +59,5 @@ func (exporter MetricsExporter) Collect(channel chan<- prometheus.Metric) {
 
 func (exporter MetricsExporter) Describe(channel chan<- *prometheus.Desc) {
 	channel <- NodeCount
+	channel <- NodeStatus
 }
