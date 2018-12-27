@@ -89,3 +89,17 @@ func TestGetNodeInfosReturnsInfoFromAllNodes(t *testing.T) {
 	assert.Equal(t, "standby", secondInfo.role)
 	assert.Equal(t, 23410272, secondInfo.replicationDelay)
 }
+
+func TestGetNodeInfosReturnsEmptyNodeInfoWithMalformedStdout(t *testing.T) {
+	pcpStdouts := []string{
+		"1\n",
+		"asdfasf\n",
+	}
+	testExecutor := NewTestExecutor(pcpStdouts, nil)
+
+	pgpool := NewPgPool(testExecutor)
+
+	nodeInfos := pgpool.GetNodeInfos()
+	assert.Equal(t, "", nodeInfos[0].hostname)
+	assert.Equal(t, 0, nodeInfos[0].port)
+}

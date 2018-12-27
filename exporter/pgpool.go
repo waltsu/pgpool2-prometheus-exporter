@@ -90,16 +90,13 @@ func buildNodeInfo(rawNodeInfo []string) NodeInfo {
 		return nodeInfo
 	}
 
+	// No need to handle error cases, regex will make sure that numbers are numbers
 	nodeInfo.hostname = rawNodeInfo[1]
 	nodeInfo.port, _ = strconv.Atoi(rawNodeInfo[2])
 	nodeInfo.status, _ = strconv.Atoi(rawNodeInfo[3])
 	nodeInfo.weight, _ = strconv.ParseFloat(rawNodeInfo[4], 64)
 	nodeInfo.role = rawNodeInfo[6]
-	if replicationDelay, err := strconv.Atoi(rawNodeInfo[7]); err != nil {
-		nodeInfo.replicationDelay = -1
-	} else {
-		nodeInfo.replicationDelay = replicationDelay
-	}
+	nodeInfo.replicationDelay, _ = strconv.Atoi(rawNodeInfo[7])
 
 	return nodeInfo
 }
